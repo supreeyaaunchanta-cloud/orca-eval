@@ -250,7 +250,7 @@ function EvaluationForm({ onSubmit }) {
           {[
             { label: "ชื่อ-นามสกุลพนักงาน *", key: "employeeName", placeholder: "กรอกชื่อพนักงาน" },
             { label: "รหัสพนักงาน", key: "employeeId", placeholder: "เช่น EMP-001" },
-            { label: "ตำแหน่ง *", key: "position", placeholder: "เช่น ช่างเคาะตัวถัง, ช่างพ่นสี" },
+            { label: "ตำแหน่ง *", key: "position", type: "select" },
             { label: "แผนก/หน่วยงาน", key: "department", placeholder: "เช่น ฝ่ายซ่อมบำรุง" },
             { label: "ชื่อผู้ประเมิน *", key: "evaluator", placeholder: "กรอกชื่อผู้ประเมิน" },
             { label: "ตำแหน่งผู้ประเมิน", key: "evaluatorPosition", placeholder: "เช่น หัวหน้าช่าง" },
@@ -259,12 +259,53 @@ function EvaluationForm({ onSubmit }) {
           ].map(({ label, key, placeholder, type }) => (
             <div key={key}>
               <label style={{ fontSize: 11, color: "#64748b", fontWeight: 600, display: "block", marginBottom: 4 }}>{label}</label>
+              {type === "select" ? (
+                <select value={info[key]} onChange={(e) => setInfoField(key, e.target.value)}
+                  style={{ width: "100%", boxSizing: "border-box", padding: "8px 11px", border: "1.5px solid #cbd5e1", borderRadius: 8, fontSize: 13, fontFamily: "inherit", color: info[key] ? "#1e293b" : "#94a3b8", outline: "none", background: "#fff", cursor: "pointer" }}>
+                  <option value="">— เลือกตำแหน่ง —</option>
+                  <optgroup label="ฝ่ายบริหาร">
+                    <option>ผู้ช่วยผู้จัดการทั่วไป</option>
+                    <option>เจ้าหน้าที่บริหารข้อมูล</option>
+                    <option>เจ้าหน้าที่ธุรการทั่วไปส่วนกลาง</option>
+                    <option>เจ้าหน้าที่การเงิน และบัญชี</option>
+                    <option>เจ้าหน้าที่ทรัพยากรบุคคล</option>
+                    <option>เจ้าหน้าที่จัดซื้อ</option>
+                    <option>เจ้าหน้าที่เทคนิคส่วนกลาง</option>
+                  </optgroup>
+                  <optgroup label="ฝ่ายจัดการ">
+                    <option>ผู้จัดการเขต</option>
+                    <option>ผู้จัดการสาขา</option>
+                    <option>ผู้ช่วยผู้จัดการสาขา</option>
+                    <option>พนักงานควบคุมงานซ่อม</option>
+                    <option>เจ้าหน้าที่ธุรการสาขา</option>
+                    <option>เจ้าหน้าที่อะไหล่และสโตร์</option>
+                    <option>เจ้าหน้าที่ตรวจสอบคุณภาพ</option>
+                  </optgroup>
+                  <optgroup label="ช่างเทคนิค">
+                    <option>ช่างซ่อมตัวถัง ระดับ 2</option>
+                    <option>ช่างซ่อมตัวถัง ระดับ 1</option>
+                    <option>ช่างเตรียมพื้น ระดับ 2</option>
+                    <option>ช่างเตรียมพื้น ระดับ 1</option>
+                    <option>ช่างพ่นสี</option>
+                    <option>ช่างผสมสี</option>
+                    <option>ช่างถอดประกอบ ระดับ 2</option>
+                    <option>ช่างถอดประกอบ ระดับ 1</option>
+                    <option>ช่างขัดสี-ขัดเงา</option>
+                  </optgroup>
+                  <optgroup label="พนักงานทั่วไป">
+                    <option>พนักงานล้างรถ-เก็บงาน</option>
+                    <option>พนักงานฝึกงาน</option>
+                    <option>แม่บ้าน</option>
+                  </optgroup>
+                </select>
+              ) : (
               <input
                 type={type || "text"} value={info[key]}
                 onChange={(e) => setInfoField(key, e.target.value)}
                 placeholder={placeholder}
                 style={{ width: "100%", boxSizing: "border-box", padding: "8px 11px", border: "1.5px solid #cbd5e1", borderRadius: 8, fontSize: 13, fontFamily: "inherit", color: "#1e293b", outline: "none" }}
               />
+              )}
             </div>
           ))}
         </div>
