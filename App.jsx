@@ -313,7 +313,7 @@ function EvaluationForm({ onSubmit }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[
             { label: "ชื่อ-นามสกุลพนักงาน *", key: "employeeName", placeholder: "กรอกชื่อพนักงาน" },
-            { label: "รหัสพนักงาน", key: "employeeId", placeholder: "เช่น EMP-001" },
+            { label: "รหัสพนักงาน", key: "employeeId", placeholder: "เช่น NS1234567 },
             { label: "ตำแหน่ง *", key: "position", type: "select_position" },
             { label: "สาขา *", key: "branch", type: "select_branch" },
             { label: "ชื่อผู้ประเมิน *", key: "evaluator", placeholder: "กรอกชื่อผู้ประเมิน" },
