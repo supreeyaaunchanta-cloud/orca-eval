@@ -313,12 +313,12 @@ function EvaluationForm({ onSubmit }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[
             { label: "ชื่อ-นามสกุลพนักงาน *", key: "employeeName", placeholder: "กรอกชื่อพนักงาน" },
-            { label: "รหัสพนักงาน", key: "employeeId", placeholder: "เช่น NS1234567 },
+            { label: "รหัสพนักงาน", key: "employeeId", placeholder: "เช่น NS1234567" },
             { label: "ตำแหน่ง *", key: "position", type: "select_position" },
             { label: "สาขา *", key: "branch", type: "select_branch" },
             { label: "ชื่อผู้ประเมิน *", key: "evaluator", placeholder: "กรอกชื่อผู้ประเมิน" },
             { label: "ตำแหน่งผู้ประเมิน", key: "evaluatorPosition", placeholder: "เช่น หัวหน้าช่าง" },
-            { label: "รอบการประเมิน", key: "period", placeholder: "เช่น ประจำปี 2567 ครั้งที่ 1" },
+            { label: "รอบการประเมิน", key: "period", placeholder: "เช่น ประจำปี 2569 ครั้งที่ 1" },
             { label: "วันที่ประเมิน", key: "evalDate", type: "date" },
           ].map(({ label, key, placeholder, type }) => (
             <div key={key}>
