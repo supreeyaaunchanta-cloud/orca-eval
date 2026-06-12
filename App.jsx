@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import {
   RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip
 } from "recharts";
 
+// ⚠️ แก้ URL นี้เป็น Web App URL ที่ได้จากการ Deploy Google Apps Script
+// ดูวิธีตั้งค่าในไฟล์ google-apps-script.gs และ SETUP-GOOGLE-SHEET.md
+const GOOGLE_SHEET_WEBAPP_URL = "https://script.google.com/macros/s/AKfycby7JniRUGBOoh0pTEUtK1uEIVaZgfdSORR0TEH4UdhvcEbV61AkJ52pSvsDcSMYGzCn/exec";
+
 const COMPANY = {
-  name: "บริษัท ออร์ก้า ซับคอนแทรค แอนด์ คอนซัลแทนท์ จำกัด",
+  name: "ORCA SUBCONTRACT AND CONSULTANT Co., Ltd.",
   business: "การบำรุงรักษารถยนต์และการซ่อมตัวถัง ประตู หน้าต่าง และอื่น ๆ ที่คล้ายกัน",
   category: "การบำรุงรักษาและการซ่อมตัวถัง ประตู หน้าต่าง และอื่น ๆ ที่คล้ายกัน",
 };
@@ -280,6 +284,107 @@ const SCORE_META = {
   1: { label: "ไม่ผ่านเกณฑ์", color: "#dc2626", bg: "#fee2e2" },
 };
 
+// ─── PDF generation (mobile-friendly via html2canvas + jsPDF) ──────────────
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) return resolve();
+    const s = document.createElement("script");
+    s.src = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+async function generatePDF(elementId, filename) {
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+
+  const el = document.getElementById(elementId);
+  const canvas = await window.html2canvas(el, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
+  const imgData = canvas.toDataURL("image/jpeg", 0.95);
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p", "mm", "a4");
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const imgWidth = pageWidth;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position = 0;
+
+  pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+  heightLeft -= pageHeight;
+
+  while (heightLeft > 0) {
+    position = heightLeft - imgHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+
+  pdf.save(filename);
+}
+
+// ─── Google Sheet submission ────────────────────────────────────────────────
+function getQuarter(dateStr) {
+  const d = new Date(dateStr);
+  const q = Math.floor(d.getMonth() / 3) + 1;
+  return `Q${q}/${d.getFullYear()}`;
+}
+
+async function submitToGoogleSheet(payload, totalScore, grade) {
+  if (!GOOGLE_SHEET_WEBAPP_URL || GOOGLE_SHEET_WEBAPP_URL.includes("YOUR_DEPLOYMENT_ID")) {
+    return { ok: false, reason: "not_configured" };
+  }
+  const { info, scores, comments, generalComment, sections } = payload;
+
+  const rows = [];
+  sections.forEach((sec) => {
+    sec.groups.forEach((g) => {
+      g.criteria.forEach((c) => {
+        rows.push({
+          section: sec.label,
+          criteria: c.label,
+          score: scores[c.id] || 0,
+          comment: comments[c.id] || "",
+        });
+      });
+    });
+  });
+
+  const body = {
+    timestamp: new Date().toISOString(),
+    quarter: getQuarter(info.evalDate),
+    employeeName: info.employeeName,
+    employeeId: info.employeeId,
+    position: info.position,
+    branch: info.branch,
+    evaluator: info.evaluator,
+    evaluatorPosition: info.evaluatorPosition,
+    period: info.period,
+    evalDate: info.evalDate,
+    totalScore: totalScore.toFixed(1),
+    grade: `${grade.label} (${grade.letter})`,
+    generalComment,
+    details: rows,
+  };
+
+  try {
+    await fetch(GOOGLE_SHEET_WEBAPP_URL, {
+      method: "POST",
+      mode: "no-cors", // Apps Script web apps don't return CORS headers
+      headers: { "Content-Type": "text/plain" },
+      body: JSON.stringify(body),
+    });
+    // With no-cors we can't read the response, assume success if no network error
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, reason: "network_error", error: err };
+  }
+}
+
 function getGrade(score) {
   if (score >= 90) return { label: "ดีเยี่ยม", sub: "ทักษะสูง ทำงานได้เกินมาตรฐาน", color: "#16a34a", letter: "A" };
   if (score >= 80) return { label: "ดี", sub: "ทำงานได้มาตรฐาน งานเสร็จตามกำหนด", color: "#2563eb", letter: "B" };
@@ -521,16 +626,61 @@ function Transcript({ payload, totalScore, grade, onBack }) {
   const { info, scores, comments, generalComment, sections } = payload;
   const evalDate = info.evalDate ? new Date(info.evalDate).toLocaleDateString("th-TH", { year: "numeric", month: "long", day: "numeric" }) : "";
   const posGroup = getPositionGroup(info.position);
+  const [pdfLoading, setPdfLoading] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("saving"); // saving | saved | error | skipped
+
+  useEffect(() => {
+    let mounted = true;
+    submitToGoogleSheet(payload, totalScore, grade).then((res) => {
+      if (!mounted) return;
+      if (res.ok) setSaveStatus("saved");
+      else if (res.reason === "not_configured") setSaveStatus("skipped");
+      else setSaveStatus("error");
+    });
+    return () => { mounted = false; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleDownloadPDF = async () => {
+    setPdfLoading(true);
+    try {
+      const filename = `Transcript_${info.employeeName || "employee"}_${info.evalDate || ""}.pdf`;
+      await generatePDF("transcript-content", filename);
+    } catch (err) {
+      alert("ไม่สามารถสร้าง PDF ได้ กรุณาลองใหม่อีกครั้ง");
+    } finally {
+      setPdfLoading(false);
+    }
+  };
 
   return (
     <div style={{ fontFamily: "Sarabun, Noto Sans Thai, sans-serif" }}>
       <div className="no-print" style={{ background: "#1e3a5f", padding: "11px 20px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 }}>
         <button onClick={onBack} style={{ background: "transparent", border: "1.5px solid rgba(255,255,255,0.35)", color: "#fff", padding: "6px 14px", borderRadius: 8, cursor: "pointer", fontSize: 12, fontFamily: "inherit" }}>← แก้ไข</button>
         <span style={{ color: "#fff", fontWeight: 600, fontSize: 13 }}>ใบ Transcript ผลการประเมินพนักงาน</span>
-        <button onClick={() => window.print()} style={{ background: "#f59e0b", border: "none", color: "#1e3a5f", padding: "7px 16px", borderRadius: 8, cursor: "pointer", fontSize: 12, fontWeight: 700, fontFamily: "inherit" }}>🖨️ พิมพ์ / PDF</button>
+        <button onClick={handleDownloadPDF} disabled={pdfLoading}
+          style={{ background: pdfLoading ? "#9ca3af" : "#f59e0b", border: "none", color: "#1e3a5f", padding: "7px 16px", borderRadius: 8, cursor: pdfLoading ? "default" : "pointer", fontSize: 12, fontWeight: 700, fontFamily: "inherit" }}>
+          {pdfLoading ? "⏳ กำลังสร้าง..." : "⬇️ ดาวน์โหลด PDF"}
+        </button>
       </div>
 
-      <div style={{ maxWidth: 800, margin: "24px auto", padding: "0 16px 48px" }}>
+      {/* Save status banner */}
+      <div className="no-print" style={{ maxWidth: 800, margin: "10px auto 0", padding: "0 16px" }}>
+        {saveStatus === "saving" && (
+          <div style={{ background: "#fef9c3", border: "1px solid #fde68a", borderRadius: 8, padding: "8px 14px", fontSize: 12, color: "#854d0e" }}>⏳ กำลังบันทึกข้อมูลลง Google Sheet...</div>
+        )}
+        {saveStatus === "saved" && (
+          <div style={{ background: "#dcfce7", border: "1px solid #bbf7d0", borderRadius: 8, padding: "8px 14px", fontSize: 12, color: "#166534" }}>✅ บันทึกข้อมูลลง Google Sheet เรียบร้อยแล้ว</div>
+        )}
+        {saveStatus === "error" && (
+          <div style={{ background: "#fee2e2", border: "1px solid #fecaca", borderRadius: 8, padding: "8px 14px", fontSize: 12, color: "#991b1b" }}>⚠️ บันทึกข้อมูลไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อ</div>
+        )}
+        {saveStatus === "skipped" && (
+          <div style={{ background: "#f1f5f9", border: "1px solid #e2e8f0", borderRadius: 8, padding: "8px 14px", fontSize: 12, color: "#64748b" }}>ℹ️ ยังไม่ได้เชื่อมต่อ Google Sheet (ดูวิธีตั้งค่าใน SETUP-GOOGLE-SHEET.md)</div>
+        )}
+      </div>
+
+      <div id="transcript-content" style={{ maxWidth: 800, margin: "24px auto", padding: "0 16px 48px" }}>
         <div style={{ textAlign: "center", borderBottom: "3px solid #1e3a5f", paddingBottom: 14, marginBottom: 18 }}>
           <img src={LOGO} alt="ORCA" style={{ width: 70, height: 70, borderRadius: 12, objectFit: "cover", marginBottom: 8 }} />
           <div style={{ fontSize: 17, fontWeight: 800, color: "#1e3a5f" }}>{COMPANY.name}</div>
