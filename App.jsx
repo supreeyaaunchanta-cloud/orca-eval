@@ -4,9 +4,9 @@ import {
 } from "recharts";
 
 const COMPANY = {
-  name: "ORCA SUBCONTRACT AND CONSULTANT Co., Ltd.",
-  business: "ยกระดับคุณภาพงานซ่อมสีและตัวถังรถยนต์ โดยใช้ทีมช่างผู้เชี่ยวชาญเฉพาะทางและเลือกใช้ผลิตภัณฑ์คุณภาพสูง",
-  category: "ยกระดับคุณภาพงานซ่อมสีและตัวถังรถยนต์ โดยใช้ทีมช่างผู้เชี่ยวชาญเฉพาะทางและเลือกใช้ผลิตภัณฑ์คุณภาพสูง",
+  name: "บริษัท ออร์ก้า ซับคอนแทรค แอนด์ คอนซัลแทนท์ จำกัด",
+  business: "การบำรุงรักษารถยนต์และการซ่อมตัวถัง ประตู หน้าต่าง และอื่น ๆ ที่คล้ายกัน",
+  category: "การบำรุงรักษาและการซ่อมตัวถัง ประตู หน้าต่าง และอื่น ๆ ที่คล้ายกัน",
 };
 
 const LOGO = "data:image/jpeg;base64,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";
@@ -30,6 +30,75 @@ const POSITIONS = {
   general: ["พนักงานล้างรถ-เก็บงาน","พนักงานฝึกงาน","แม่บ้าน"],
 };
 
+const HARD_SKILLS_BY_POSITION = {
+  "ช่างซ่อมตัวถัง ระดับ 2": [
+    { id: "body", label: "ช่างซ่อมตัวถัง ระดับ 2", criteria: [
+      { id: "h1", label: "การคืนรูปตัวถัง", desc: "ซ่อมแซมชิ้นงานเบื้องต้นให้กลับคืนรูปเดิมตามมาตรฐานโรงงาน ภายใต้คำแนะนำ" },
+      { id: "h2", label: "การใช้เครื่องมือ", desc: "ความชำนาญในการใช้เครื่องมือดึงตัวถัง เครื่องเชื่อม และอุปกรณ์พื้นฐาน" },
+      { id: "h3", label: "ความเรียบร้อยของพื้นผิว", desc: "การโป๊วสี เก็บรายละเอียดพื้นผิวเบื้องต้นก่อนส่งต่อ" },
+    ]},
+  ],
+  "ช่างซ่อมตัวถัง ระดับ 1": [
+    { id: "body", label: "ช่างซ่อมตัวถัง ระดับ 1", criteria: [
+      { id: "h1", label: "การคืนรูปตัวถัง", desc: "ซ่อมแซมชิ้นงานที่ซับซ้อนให้กลับคืนรูปเดิมตามมาตรฐานโรงงานได้แม่นยำด้วยตนเอง" },
+      { id: "h2", label: "การใช้เครื่องมือขั้นสูง", desc: "ความชำนาญในการใช้เครื่องมือดึงตัวถัง เครื่องเชื่อม และอุปกรณ์เฉพาะทางอย่างครบถ้วน" },
+      { id: "h3", label: "ความเรียบร้อยของพื้นผิว", desc: "การโป๊วสี เก็บรายละเอียดพื้นผิวได้เรียบเนียนตามมาตรฐานก่อนส่งมอบงานให้ช่างพ่นสี" },
+      { id: "h4", label: "การถ่ายทอดความรู้", desc: "สามารถให้คำแนะนำและตรวจสอบงานของช่างระดับ 2 ได้" },
+    ]},
+  ],
+  "ช่างเตรียมพื้น ระดับ 2": [
+    { id: "body", label: "ช่างเตรียมพื้น ระดับ 2", criteria: [
+      { id: "h1", label: "การขัดเตรียมพื้นผิวเบื้องต้น", desc: "ขัดและทำความสะอาดพื้นผิวก่อนพ่นสีตามขั้นตอนพื้นฐาน" },
+      { id: "h2", label: "การใช้วัสดุและเครื่องมือเตรียมพื้น", desc: "ใช้กระดาษทราย เครื่องขัด และวัสดุรองพื้นได้ถูกต้อง" },
+      { id: "h3", label: "การปิดมาสกิ้ง (Masking)", desc: "ปิดส่วนที่ไม่ต้องการพ่นสีได้เรียบร้อย ไม่มีรอยเปื้อน" },
+    ]},
+  ],
+  "ช่างเตรียมพื้น ระดับ 1": [
+    { id: "body", label: "ช่างเตรียมพื้น ระดับ 1", criteria: [
+      { id: "h1", label: "การขัดเตรียมพื้นผิวขั้นสูง", desc: "ขัดเตรียมพื้นผิวที่ซับซ้อน เก็บรายละเอียดเรียบเนียนพร้อมพ่นสีได้มาตรฐาน" },
+      { id: "h2", label: "การเลือกใช้วัสดุรองพื้น", desc: "เลือกและใช้สีรองพื้น (Primer/Putty) ให้เหมาะกับพื้นผิวแต่ละประเภท" },
+      { id: "h3", label: "การปิดมาสกิ้งขั้นสูง", desc: "ปิดมาสกิ้งงานที่ซับซ้อน หลายสี หลายขั้นตอนได้แม่นยำ" },
+      { id: "h4", label: "การถ่ายทอดความรู้", desc: "สามารถให้คำแนะนำและตรวจสอบงานของช่างระดับ 2 ได้" },
+    ]},
+  ],
+  "ช่างพ่นสี": [
+    { id: "paint", label: "ช่างพ่นสี", criteria: [
+      { id: "h1", label: "การเทียบสีและผสมสี", desc: "ความแม่นยำในการผสมสีให้ตรงกับตัวรถเดิมและเฉดสีไม่ผิดเพี้ยน" },
+      { id: "h2", label: "เทคนิคการพ่นสี", desc: "การลงสีได้สม่ำเสมอ ไม่มีรอยด่าง สีไหล หรือเม็ดฝุ่นบนผิวงาน" },
+      { id: "h3", label: "การอบและขัดเงา", desc: "สามารถอบสีตามอุณหภูมิที่กำหนด และขัดเคลือบเงาเก็บรายละเอียดงานได้สมบูรณ์" },
+    ]},
+  ],
+  "ช่างผสมสี": [
+    { id: "mix", label: "ช่างผสมสี", criteria: [
+      { id: "h1", label: "การเทียบสีและผสมสี", desc: "ความแม่นยำในการผสมสีให้ตรงกับตัวรถเดิมและเฉดสีไม่ผิดเพี้ยน ใช้ระบบผสมสีได้ถูกต้อง" },
+      { id: "h2", label: "การจัดการสต๊อกสีและวัสดุ", desc: "จัดเก็บ ดูแล และเบิกจ่ายสีและวัสดุผสมสีอย่างเป็นระบบ ไม่สูญเปล่า" },
+      { id: "h3", label: "การปรับแก้สูตรสี", desc: "ปรับแก้สูตรสีให้ตรงตามที่ต้องการเมื่อสีที่ผสมไม่ตรงเฉด" },
+    ]},
+  ],
+  "ช่างถอดประกอบ ระดับ 2": [
+    { id: "assembly", label: "ช่างถอดประกอบ ระดับ 2", criteria: [
+      { id: "h1", label: "การถอด-ประกอบชิ้นส่วนพื้นฐาน", desc: "ถอดและประกอบชิ้นส่วนตัวถัง ประตู หน้าต่าง ตามขั้นตอนมาตรฐาน" },
+      { id: "h2", label: "การใช้เครื่องมือถอดประกอบ", desc: "ใช้เครื่องมือได้ถูกต้องและปลอดภัย ไม่ทำให้ชิ้นงานเสียหาย" },
+      { id: "h3", label: "การจัดเก็บชิ้นส่วน", desc: "จัดเก็บและติดป้ายชิ้นส่วนที่ถอดออกอย่างเป็นระบบ ไม่สูญหาย" },
+    ]},
+  ],
+  "ช่างถอดประกอบ ระดับ 1": [
+    { id: "assembly", label: "ช่างถอดประกอบ ระดับ 1", criteria: [
+      { id: "h1", label: "การถอด-ประกอบชิ้นส่วนซับซ้อน", desc: "ถอดและประกอบชิ้นส่วนที่ซับซ้อน เช่น ระบบไฟ เซนเซอร์ และอุปกรณ์ตกแต่งได้ถูกต้อง" },
+      { id: "h2", label: "การตรวจสอบความเรียบร้อยหลังประกอบ", desc: "ตรวจสอบการทำงานของระบบต่างๆ หลังประกอบกลับให้ใช้งานได้ปกติ" },
+      { id: "h3", label: "การจัดเก็บและจัดการชิ้นส่วน", desc: "จัดเก็บชิ้นส่วนอย่างเป็นระบบ ป้องกันการสูญหายหรือเสียหาย" },
+      { id: "h4", label: "การถ่ายทอดความรู้", desc: "สามารถให้คำแนะนำและตรวจสอบงานของช่างระดับ 2 ได้" },
+    ]},
+  ],
+  "ช่างขัดสี-ขัดเงา": [
+    { id: "polish", label: "ช่างขัดสี-ขัดเงา", criteria: [
+      { id: "h1", label: "เทคนิคการขัดสี", desc: "ขัดผิวสีให้เรียบเนียน ลบรอยตำหนิเล็กๆ โดยไม่ทำให้สีบาง" },
+      { id: "h2", label: "การขัดเคลือบเงา (Polishing/Coating)", desc: "ขัดเคลือบเงาให้ผิวสีเงางามสม่ำเสมอ ตรงตามมาตรฐานก่อนส่งมอบ" },
+      { id: "h3", label: "การใช้สารเคมีและอุปกรณ์ขัดเงา", desc: "เลือกใช้น้ำยาขัดและแผ่นขัดให้เหมาะกับชนิดสีและความเสียหาย" },
+    ]},
+  ],
+};
+
 const GROUP_LABELS = {
   management: "ฝ่ายบริหาร",
   supervisor: "ฝ่ายจัดการ",
@@ -51,18 +120,7 @@ const SECTIONS_BY_GROUP = {
     {
       id: "hard", label: "ส่วนที่ 1: ทักษะความเชี่ยวชาญเฉพาะด้าน", labelShort: "Hard Skills",
       icon: "🔧", color: "#1e3a5f", weight: 40,
-      groups: [
-        { id: "body", label: "ช่างเคาะ / ช่างตัวถัง", criteria: [
-          { id: "h1", label: "การคืนรูปตัวถัง", desc: "ซ่อมแซมชิ้นงานให้กลับคืนรูปเดิมตามมาตรฐานโรงงาน" },
-          { id: "h2", label: "การใช้เครื่องมือ", desc: "ความชำนาญในการใช้เครื่องมือดึงตัวถัง เครื่องเชื่อม และอุปกรณ์ต่างๆ" },
-          { id: "h3", label: "ความเรียบร้อยของพื้นผิว", desc: "การโป๊วสี เก็บรายละเอียดพื้นผิวได้เรียบเนียนก่อนส่งมอบงาน" },
-        ]},
-        { id: "paint", label: "ช่างพ่นสี", criteria: [
-          { id: "h4", label: "การเทียบสีและผสมสี", desc: "ความแม่นยำในการผสมสีให้ตรงกับตัวรถเดิม ไม่ผิดเฉด" },
-          { id: "h5", label: "เทคนิคการพ่นสี", desc: "ลงสีได้สม่ำเสมอ ไม่มีรอยด่าง สีไหล หรือเม็ดฝุ่น" },
-          { id: "h6", label: "การอบและขัดเงา", desc: "อบสีตามอุณหภูมิที่กำหนด ขัดเคลือบเงาได้สมบูรณ์" },
-        ]},
-      ],
+      groups: "BY_POSITION", // resolved dynamically based on info.position
     },
     {
       id: "productivity", label: "ส่วนที่ 2: ประสิทธิภาพในการทำงาน", labelShort: "Productivity",
@@ -278,7 +336,14 @@ function EvaluationForm({ onSubmit }) {
   };
 
   const posGroup = getPositionGroup(info.position);
-  const sections = posGroup ? SECTIONS_BY_GROUP[posGroup] : null;
+  let sections = posGroup ? SECTIONS_BY_GROUP[posGroup] : null;
+  if (sections && posGroup === "technician") {
+    sections = sections.map((s) =>
+      s.groups === "BY_POSITION"
+        ? { ...s, groups: HARD_SKILLS_BY_POSITION[info.position] || [] }
+        : s
+    );
+  }
   const allCriteria = sections ? sections.flatMap((s) => s.groups.flatMap((g) => g.criteria)) : [];
   const scoredCount = allCriteria.filter((c) => scores[c.id]).length;
   const allScored = allCriteria.length > 0 && scoredCount === allCriteria.length;
@@ -313,12 +378,12 @@ function EvaluationForm({ onSubmit }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
           {[
             { label: "ชื่อ-นามสกุลพนักงาน *", key: "employeeName", placeholder: "กรอกชื่อพนักงาน" },
-            { label: "รหัสพนักงาน", key: "employeeId", placeholder: "เช่น NS1234567" },
+            { label: "รหัสพนักงาน", key: "employeeId", placeholder: "เช่น NS0000000" },
             { label: "ตำแหน่ง *", key: "position", type: "select_position" },
             { label: "สาขา *", key: "branch", type: "select_branch" },
             { label: "ชื่อผู้ประเมิน *", key: "evaluator", placeholder: "กรอกชื่อผู้ประเมิน" },
             { label: "ตำแหน่งผู้ประเมิน", key: "evaluatorPosition", placeholder: "เช่น หัวหน้าช่าง" },
-            { label: "รอบการประเมิน", key: "period", placeholder: "เช่น ประจำปี 2569 ครั้งที่ 1" },
+            { label: "รอบการประเมิน", key: "period", placeholder: "เช่น ประจำปี 2567 ครั้งที่ 1" },
             { label: "วันที่ประเมิน", key: "evalDate", type: "date" },
           ].map(({ label, key, placeholder, type }) => (
             <div key={key}>
